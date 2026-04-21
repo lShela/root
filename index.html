@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>terminal</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --fg: #9effa1;
+      --dim: #6fbf73;
+    }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    .wrap {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    .term {
+      width: min(760px, 100%);
+      border: 1px solid #1d1d1d;
+      border-radius: 14px;
+      box-shadow: 0 0 0 1px #111, 0 12px 40px rgba(0,0,0,.45);
+      overflow: hidden;
+      background: #0d0d0d;
+    }
+
+    .bar {
+      height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 14px;
+      background: #111;
+      border-bottom: 1px solid #1d1d1d;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #2a2a2a;
+    }
+
+    .screen {
+      padding: 20px;
+      font-size: 18px;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .line {
+      opacity: 0;
+      animation: show 0.08s linear forwards;
+    }
+
+    .prompt { color: var(--dim); }
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      margin-left: 3px;
+      animation: blink 1s steps(1) infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    @keyframes show {
+      to { opacity: 1; }
+    }
+
+    @media (max-width: 480px) {
+      .screen { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="term">
+      <div class="bar">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <div id="screen" class="screen"></div>
+    </div>
+  </div>
+
+  <script>
+    const lines = [
+      "> scan_chip",
+      "> decoding...",
+      "> human interface detected",
+      "> welcome, operator"
+    ];
+
+    const screen = document.getElementById("screen");
+
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function typeLine(text) {
+      const line = document.createElement("div");
+      line.className = "line";
+      screen.appendChild(line);
+
+      for (let i = 0; i < text.length; i++) {
+        line.textContent = text.slice(0, i + 1);
+        await wait(28);
+      }
+    }
+
+    async function run() {
+      for (const line of lines) {
+        await typeLine(line);
+        await wait(320);
+      }
+
+      const last = document.createElement("div");
+      last.innerHTML = `<span class="prompt">></span><span class="cursor">█</span>`;
+      screen.appendChild(last);
+    }
+
+    run();
+  </script>
+</body>
+</html>
